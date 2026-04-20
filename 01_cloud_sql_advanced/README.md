@@ -1,56 +1,52 @@
-# CLOUD AND SQL ADVANCED – E-commerce Performance Analysis
+# E-commerce Performance Analysis (SQL)
 
-**4 SQL queries** optimisées pour analyser les performances des commandes, utilisateurs, produits et vendeurs sur une base e-commerce.
+## Objective
 
-## Compétences
+Analyze an e-commerce dataset to extract key business insights across orders, customers, products, and sellers.
 
-- Agrégations complexes (`SUM`, `COUNT`, `AVG`, `COUNT(DISTINCT)`)
-- Fenêtrage (`ROW_NUMBER()`)
-- Gestion des valeurs nulles (`COALESCE`)
-- Arrondis propres (`ROUND`)
-- Jointures multiples (`INNER JOIN`, `LEFT JOIN`)
-- CTE (`WITH`) pour une logique claire et modulaire
-- Filtrage des commandes invalides
+---
 
-## Queries incluses
+## Key Analyses
 
-| # | Sujet | Métriques clés |
-|---|-------|----------------|
-| 1 | **Orders** | total_order_value, total_items, distinct_items_count, avg_feedback_score |
-| 2 | **Customers** | total_spent, order_count, favorite_product, customer_name, customer_city |
-| 3 | **Products** | distinct_buyers_count, top_region, product_volume |
-| 4 | **Sellers** | total_revenue (price + shipping_cost), avg_feedback_score |
+### Orders
+- Total order value
+- Number of items
+- Average customer feedback
 
-## Extrait (Question 3 – product)
+### Customers
+- Total spending (LTV)
+- Number of orders
+- Favorite product
 
-```sql
-WITH product_summary AS (
-    SELECT
-        oi.product_id,
-        u.customer_city,
-        COUNT(DISTINCT u.user_name) AS total_customers
-    FROM order_items AS oi
-    LEFT JOIN orders AS o ON oi.order_id = o.order_id
-    LEFT JOIN users AS u ON o.user_name = u.user_name
-    GROUP BY product_id, u.customer_city
-),
+### Products
+- Number of buyers
+- Dominant region
+- Sales volume
 
-dominant_customers AS (
-    SELECT
-        product_id,
-        customer_city,
-        total_customers,
-        ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY total_customers DESC) AS rank
-    FROM product_summary
-)
+### Sellers
+- Total revenue
+- Average feedback score
 
-SELECT
-    p.product_id,
-    p.product_category,
-    (p.product_length_cm * p.product_width_cm * p.product_height_cm) AS product_volume_cm3,
-    dc.customer_city AS dominant_customer_city,
-    dc.total_customers AS dominant_customer_count
-FROM product AS p 
-LEFT JOIN dominant_customers AS dc ON p.product_id = dc.product_id AND dc.rank = 1;
+---
 
-...
+## Approach
+
+- Modular SQL using CTEs
+- Clean aggregations
+- Window functions for ranking (ROW_NUMBER)
+- NULL handling (COALESCE)
+
+---
+
+## Files
+
+- `orders_metrics.sql`
+- `users_metrics.sql`
+- `products_metrics.sql`
+- `sellers_metrics.sql`
+
+---
+
+## Key Insight
+
+This project demonstrates how raw transactional data can be transformed into actionable business insights using SQL.
