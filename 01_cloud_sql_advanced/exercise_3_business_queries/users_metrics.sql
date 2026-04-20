@@ -1,27 +1,29 @@
 WITH orders_per_user AS (
     SELECT
-        user_name,
-        COUNT(order_id) AS total_orders,
-        SUM(oi.price * oi.quantity + oi.shipping_cost) AS total_order_value
+        o.user_name,
+        COUNT(DISTINCT o.order_id) AS total_orders,
+        SUM(oi.price * oi.quantity + oi.shipping_cost) AS total_spent
     FROM `order_items` AS oi
     LEFT JOIN orders AS o ON oi.order_id = o.order_id
-    GROUP BY user_name
+    GROUP BY o.user_name
 ),
+
 favorite_product AS (
     SELECT
         o.user_name,
         oi.product_id,
-        SUM(oi.quantity) AS total_quantity
-        ROW_NUMBER() OVER (PARTITION BY oi.product_id ORDER BY total_quantity DESC) AS rank
+        SUM(oi.quantity) AS total_quantity,
+        ROW_NUMBER() OVER (PARTITION BY o.user_name ORDER BY total_quantity DESC) AS rank
     FROM order_items AS oi
     LEFT JOIN orders AS o ON oi.order_id = o.order_id
-    GROUP BY user_name, product_id
+    GROUP BY o.user_name, oi.product_id
 )
+
 SELECT
-    user_name,
-    customer_city,
-    total_orders,
-    total_order_value,
+    u.user_name,
+    u.customer_city,
+    COALESCE(opu.total_orders, 0) AS total_orders,
+    COALESCE(opu.total_spent, 0) AS total_spent,    
     fp.product_id AS favorite_product_id,
     fp.total_quantity AS favorite_product_quantity  
 FROM users AS u 
