@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: stg_ga4__event
+    description: "This model contains Google Analytics 4 events data with selected fields and extracted parameters"
+
+    columns:
+      - name: event_date
+        description: "Date when the event happened"
+        tests:
+          - not_null
+
+      - name: event_timestamp
+        description: "Exact timestamp of the event"
+        tests:
+          - not_null
+
+      - name: event_name
+        description: "Name of the event (e.g. page_view, click)"
+        tests:
+          - not_null
+
+      - name: user_pseudo_id
+        description: "Anonymous ID used to identify a user"
+        tests:
+          - not_null
+
+      - name: user_first_touch_timestamp
+        description: "Timestamp of the user's first visit"
+
+      - name: browser
+        description: "Browser used by the user (e.g. Chrome, Safari)"
+
+      - name: traffic_medium
+        description: "Marketing medium (e.g. organic, cpc, referral)"
+
+      - name: traffic_source
+        description: "Source of the traffic (e.g. google, facebook)"
+
+      - name: campaign_name
+        description: "Marketing campaign name"
+
+      - name: ga_session_id
+        description: "Unique identifier of the session"
+        tests:
+          - not_null
+
+      - name: page_title
+        description: "Title of the web page"
+
+      - name: page_location
+        description: "URL of the web page"
+        tests:
+          - not_null

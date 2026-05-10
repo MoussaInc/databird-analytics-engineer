@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: stg_airbnb__listings
+    description: "This model contains Airbnb listings data at the listing level"
+
+    columns:
+      - name: listing_id
+        description: "Primary key: unique identifier of the listing"
+        tests:
+          - not_null
+          - unique
+
+      - name: host_id
+        description: "Identifier of the host who owns the listing"
+        tests:
+          - not_null
+
+      - name: neighbourhood_cleansed
+        description: "Neighborhood where the listing is located"
+        tests:
+          - not_null
+
+      - name: room_type
+        description: "Type of room (e.g. entire home, private room)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: '{{ var("room_type_list") | as_native }}'
+
+      - name: unit_price
+        description: "Price per night in USD"
+        tests:
+          - not_null
+
+      - name: minimum_nights
+        description: "Minimum number of nights required for a booking"
+        tests:
+          - not_null
+
+      - name: number_of_reviews
+        description: "Total number of reviews for the listing"
+        tests:
+          - not_null
+
+      - name: availability_365
+        description: "Number of days the listing is available in a year"
+        tests:
+          - not_null

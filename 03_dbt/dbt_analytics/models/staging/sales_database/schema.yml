@@ -1,0 +1,160 @@
+version: 2
+
+models:
+
+# USER / CUSTOMER
+  - name: stg_sales_database__user
+    description: "This model contains customer information"
+
+    columns:
+      - name: customer_id
+        description: "Unique ID (primary key) of a customer"
+        tests:
+          - unique
+          - not_null
+
+
+# PRODUCT
+  - name: stg_sales_database__product
+    description: "This model contains product information"
+
+    columns:
+      - name: product_id
+        description: "Unique ID of the product"
+        tests:
+          - unique
+          - not_null
+
+
+# ORDERS
+  - name: stg_sales_database__orders
+    description: "This model contains customer orders"
+
+    columns:
+      - name: order_id
+        description: "Unique ID (primary key) of an order"
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: "Foreign key: ID of the customer who placed the order"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sales_database__user')
+              field: customer_id
+
+      - name: order_status
+        description: "Current status of the order"
+        tests:
+          - not_null
+          - accepted_values:
+              values: "{{ var('order_status_list') | as_native }}"
+
+
+# SELLERS
+  - name: stg_sales_database__seller
+    description: "This model contains seller information"
+
+    columns:
+      - name: seller_id
+        description: "Unique ID of a seller"
+        tests:
+          - unique
+          - not_null
+
+
+# PAYMENTS
+  - name: stg_sales_database__payment
+    description: "This model contains payment records"
+
+    columns:
+      - name: payment_id
+        description: "Unique ID of a payment"
+        tests:
+          - unique
+          - not_null
+
+      - name: payment_type
+        description: "Type of payment method"
+        tests:
+          - not_null
+          - accepted_values: 
+              name: accepted_values_payment_type_list
+              values: "{{ var('payment_type_list') | as_native }}"
+
+
+# ORDER ITEMS (FACT)
+  - name: stg_sales_database__order_item
+    description: "This model contains order item details"
+
+    columns:
+      - name: order_item_id
+        description: "Unique ID of an order item"
+        tests:
+          - unique
+          - not_null
+
+      - name: order_id
+        description: "ID of the related order"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sales_database__orders')
+              field: order_id
+
+      - name: product_id
+        description: "ID of the product"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sales_database__product')
+              field: product_id
+
+      - name: seller_id
+        description: "ID of the seller"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sales_database__seller')
+              field: seller_id
+
+      - name: quantity
+        description: "Quantity of product ordered"
+        tests:
+          - not_null
+
+      - name: unit_price
+        description: "Unit price of the product"
+        tests:
+          - not_null
+
+
+# FEEDBACK
+  - name: stg_sales_database__feedback
+    description: "This model contains customer feedback on orders"
+
+    columns:
+      - name: feedback_id
+        description: "Unique ID of a feedback"
+        tests:
+          - unique
+          - not_null
+
+      - name: order_id
+        description: "ID of the related order"
+        tests:
+          - not_null
+          - relationships:
+              name: stg_sales_database__orders_foreign_key_feedback
+              to: ref('stg_sales_database__orders')
+              field: order_id
+
+      - name: feedback_score
+        description: "Score given by the customer"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5]
+              quote: false

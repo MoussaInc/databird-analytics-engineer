@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: int_ga4__session
+    description: '{{ doc("int_ga4__session") }}'
+    columns:
+      - name: unique_session_id
+        description: "Primary key, unique identifier for each session: combinaison of 'user_pseudo_id' and 'ga_session_id' "

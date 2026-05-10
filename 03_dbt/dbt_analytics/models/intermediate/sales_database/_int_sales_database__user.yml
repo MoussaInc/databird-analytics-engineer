@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: int_sales_database__user
+    description: '{{ doc("int_sales_database__user") }}'
+    columns:
+      - name: customer_id
+        description: "Primary key, unique identifier for each user or customer"

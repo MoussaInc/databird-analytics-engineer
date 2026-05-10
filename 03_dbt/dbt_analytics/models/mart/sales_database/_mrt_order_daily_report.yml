@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mrt_order_daily_report
+    description: '{{ doc("mrt_order_daily_report") }}'

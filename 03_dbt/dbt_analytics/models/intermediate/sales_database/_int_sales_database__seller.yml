@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: int_sales_database__seller
+    description: '{{ doc("int_sales_database__seller") }}'
+    columns:
+      - name: seller_id
+        description: "Primary key, unique identifier for each seller"

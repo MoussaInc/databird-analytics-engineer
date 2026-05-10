@@ -1,0 +1,42 @@
+version: 2
+
+sources:
+  - name: sales_database
+    #database: databird-formation-494820
+    schema: dataset_fil_rouge
+    tables:
+      - name: feedback
+      - name: order_item
+      - name: orders
+      - name: payment
+      - name: product
+      - name: seller
+      - name: user
+
+  - name: gs
+    #database: databird-formation-494820
+    schema: google_sheets
+    tables:
+      - name: account_manager_region_mapping
+      - name: marketing_budget
+
+  - name: ga4
+    #database: databird-formation-494820
+    schema: ga4
+    tables:
+      - name: events_20210131
+      - name: events_20210131_flattened
+      - name: events_2021_01_05
+
+  - name: airbnb
+    #database: databird-formation-494820
+    schema: airbnb
+    tables:
+      - name: listings
+
+  - name: spotify
+    #database: databird-formation-494820
+    schema: spotify
+    tables:
+      - name: listing_data
+      - name: songs

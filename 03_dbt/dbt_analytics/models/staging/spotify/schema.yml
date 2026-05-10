@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: stg_spotify__songs
+    description: "This model contains basic information about songs from Spotify"
+    columns:
+      - name: song_id
+        description: "Unique ID of the song"
+        tests:
+          - not_null
+          - unique
+
+      - name: title
+        description: "Song title"
+
+      - name: artist
+        description: "Artist name"
+
+      - name: album
+        description: "Album name"
+
+      - name: release_year
+        description: "Year when the song was released"
+
+      - name: genre
+        description: "Type of music (genre)"
+
+  - name: stg_spotify__listing_data
+    description: "This model contains listening data for songs from Spotify"
+    columns:
+      - name: song_id
+        description: "ID of the song that was played"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_spotify__songs')
+              field: song_id
+
+      - name: listen_date
+        description: "Date when the song was listened to"
+
+      - name: minutes_listened
+        description: "Number of minutes the song was played"
+        tests:
+          - not_null

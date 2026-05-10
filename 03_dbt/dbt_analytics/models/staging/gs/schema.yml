@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_gs__account_manager_region_mapping
+    description: "This model maps each state to its assigned account manager"
+
+    columns:
+      - name: mapping_id
+        description: "Unique identifier of the mapping"
+        tests:
+          - unique
+          - not_null
+
+      - name: state
+        description: "Name of the state or region"
+        tests:
+          - not_null
+
+      - name: account_manager
+        description: "Name of the account manager responsible for the state"
+        tests:
+          - not_null     
+                   

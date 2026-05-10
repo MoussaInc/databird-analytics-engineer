@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: int_sales_database__product
+    description: '{{ doc("int_sales_database__product") }}'
+    columns:
+      - name: product_id
+        description: Primary key, unique identifer for each product
