@@ -26,8 +26,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: '{{ var("room_type_list") | as_native }}'
-
+              arguments:
+                values: '{{ var("room_type_list") | as_native }}'
       - name: unit_price
         description: "Price per night in USD"
         tests:

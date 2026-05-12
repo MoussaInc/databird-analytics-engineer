@@ -33,9 +33,9 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_spotify__songs')
-              field: song_id
-
+              arguments:
+                to: ref('stg_spotify__songs')
+                field: song_id
       - name: listen_date
         description: "Date when the song was listened to"
 

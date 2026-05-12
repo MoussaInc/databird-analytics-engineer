@@ -42,18 +42,16 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_sales_database__user')
-              field: customer_id
-
+              arguments:
+                to: ref('stg_sales_database__user')
+                field: customer_id
       - name: order_status
         description: "Current status of the order"
         tests:
           - not_null
           - accepted_values:
-              values: "{{ var('order_status_list') | as_native }}"
-
-
-# SELLERS
+              arguments:
+                values: "{{ var('order_status_list') | as_native }}"
   - name: stg_sales_database__seller
     description: "This model contains seller information"
 
@@ -80,12 +78,10 @@ models:
         description: "Type of payment method"
         tests:
           - not_null
-          - accepted_values: 
+          - accepted_values:
               name: accepted_values_payment_type_list
-              values: "{{ var('payment_type_list') | as_native }}"
-
-
-# ORDER ITEMS (FACT)
+              arguments:
+                values: "{{ var('payment_type_list') | as_native }}"
   - name: stg_sales_database__order_item
     description: "This model contains order item details"
 
@@ -101,25 +97,25 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_sales_database__orders')
-              field: order_id
-
+              arguments:
+                to: ref('stg_sales_database__orders')
+                field: order_id
       - name: product_id
         description: "ID of the product"
         tests:
           - not_null
           - relationships:
-              to: ref('stg_sales_database__product')
-              field: product_id
-
+              arguments:
+                to: ref('stg_sales_database__product')
+                field: product_id
       - name: seller_id
         description: "ID of the seller"
         tests:
           - not_null
           - relationships:
-              to: ref('stg_sales_database__seller')
-              field: seller_id
-
+              arguments:
+                to: ref('stg_sales_database__seller')
+                field: seller_id
       - name: quantity
         description: "Quantity of product ordered"
         tests:
@@ -148,13 +144,14 @@ models:
           - not_null
           - relationships:
               name: stg_sales_database__orders_foreign_key_feedback
-              to: ref('stg_sales_database__orders')
-              field: order_id
-
+              arguments:
+                to: ref('stg_sales_database__orders')
+                field: order_id
       - name: feedback_score
         description: "Score given by the customer"
         tests:
           - not_null
           - accepted_values:
-              values: [1, 2, 3, 4, 5]
-              quote: false
+              arguments:
+                values: [1, 2, 3, 4, 5]
+                quote: false
