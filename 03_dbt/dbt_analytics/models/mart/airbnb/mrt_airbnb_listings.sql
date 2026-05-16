@@ -12,3 +12,4 @@ select
     count(id) as total_listings
 from {{ ref('stg_airbnb__listings') }}
 group by neighbourhood_cleansed, room_type
+order by avg_listing_price

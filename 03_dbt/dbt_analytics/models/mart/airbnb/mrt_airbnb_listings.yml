@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: mrt_listings_nbhd
+  - name: mrt_airbnb_listings
     description: "Aggregated model showing average listing prices by neighborhood and room type"
 
     columns:
