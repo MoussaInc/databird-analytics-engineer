@@ -2,7 +2,6 @@ name: 'dbt_analytics'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
 profile: 'databird_analytics'
 
 model-paths: ["models"]
@@ -11,26 +10,22 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
-clean-targets:         # directories to be removed by `dbt clean`
+
+clean-targets:
   - "target"
   - "dbt_packages"
-
 
 models:
   +persist_docs:
     relation: true
     columns: true
-
   dbt_analytics:
     staging:
       +materialized: view
-
     intermediate:
       +materialized: view
-      # Exception: ga4 model are table
       ga4:
         +materialized: table
-
     mart:
       +materialized: table
 
@@ -38,5 +33,6 @@ vars:
   order_status_list: ['approved', 'canceled', 'created', 'delivered', 'invoiced', 'processing', 'shipped', 'unavailable']
   payment_type_list: ['credit_card', 'debit_card', 'blipay', 'voucher', 'not_defined']
   room_type_list: ['Entire home/apt', 'Private room', 'Shared room', 'Hotel room']
+
 flags:
   require_generic_test_arguments_property: true

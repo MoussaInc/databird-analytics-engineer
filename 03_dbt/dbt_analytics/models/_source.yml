@@ -29,7 +29,6 @@ sources:
       - name: events_2021_01_05
 
   - name: airbnb
-    #database: databird-formation-494820
     schema: airbnb
     tables:
       - name: listings

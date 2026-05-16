@@ -5,7 +5,7 @@ models:
     description: "This model contains Airbnb listings data at the listing level"
 
     columns:
-      - name: listing_id
+      - name: id
         description: "Primary key: unique identifier of the listing"
         tests:
           - not_null
@@ -28,7 +28,7 @@ models:
           - accepted_values:
               arguments:
                 values: '{{ var("room_type_list") | as_native }}'
-      - name: unit_price
+      - name: price
         description: "Price per night in USD"
         tests:
           - not_null
@@ -37,6 +37,11 @@ models:
         description: "Minimum number of nights required for a booking"
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 1
+                max_value: 365
+                severity: warn
 
       - name: number_of_reviews
         description: "Total number of reviews for the listing"
