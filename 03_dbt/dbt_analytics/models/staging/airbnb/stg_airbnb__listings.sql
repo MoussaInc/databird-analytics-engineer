@@ -11,4 +11,4 @@ select
     cast(minimum_nights as integer) as minimum_nights,
     cast(number_of_reviews as integer) as number_of_reviews,
     cast(availability_365 as integer) as availability_365
-from {{ source('airbnb', 'listings') }}
+from {{ source('airbnb', 'listings') }}-- test CI Sat 16 May 2026 04:38:31 PM CEST
