@@ -1,6 +1,5 @@
 # .github/workflows/dbt_ci.yml
-
-name: dbt CI
+name: dbt CI — Pull Request Check
 
 on:
   pull_request:
@@ -8,145 +7,107 @@ on:
       - main
     paths:
       - "03_dbt/dbt_analytics/**"
+      - ".github/workflows/dbt_ci.yml"
 
 env:
   PYTHON_VERSION: "3.11"
   DBT_PROJECT_DIR: "03_dbt/dbt_analytics"
-  DBT_PROFILES_DIR: ~/.dbt
 
 jobs:
   dbt-ci:
     runs-on: ubuntu-latest
-
     defaults:
       run:
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        working-directory: 03_dbt/dbt_analytics
 
     steps:
-      # ==========================================
-      # Checkout repository
-      # ==========================================
+      # 1. Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ==========================================
-      # Setup Python
-      # ==========================================
+      # 2. Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # ==========================================
-      # Install dependencies
-      # ==========================================
+      # 3. Installer dbt + bigquery
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install dbt-bigquery google-cloud-bigquery
 
-      # ==========================================
-      # Setup GCP credentials
-      # ==========================================
+      # 4. Credentials GCP
       - name: Setup GCP credentials
-        env:
-          GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
         run: |
-          echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/keyfile.json
+          echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > /tmp/keyfile.json
           chmod 600 /tmp/keyfile.json
 
-      # ==========================================
-      # Setup dbt profile
-      # ==========================================
+      # 5. profiles.yml dynamique
       - name: Setup dbt profile
-        env:
-          DBT_PROFILES_YML: ${{ secrets.DBT_PROFILES_YML }}
         run: |
           mkdir -p ~/.dbt
-          echo "$DBT_PROFILES_YML" > ~/.dbt/profiles.yml
+          cat > ~/.dbt/profiles.yml << PROFILE
+          databird_analytics:
+            target: ci
+            outputs:
+              ci:
+                type: bigquery
+                method: service-account
+                project: databird-formation-494820
+                dataset: dbt_ci_pr_${{ github.event.pull_request.number }}
+                keyfile: /tmp/keyfile.json
+                threads: 4
+                location: US
+                timeout_seconds: 300
+          PROFILE
 
-      # ==========================================
-      # Debug environment
-      # ==========================================
+      # 6. Vérifier l'environnement
       - name: Check environment
         run: |
           pwd
           ls -la
           dbt --version
 
-      # ==========================================
-      # Validate dbt connection
-      # ==========================================
+      # 7. Connexion BigQuery
       - name: dbt debug
         run: dbt debug
 
-      # ==========================================
-      # Install dbt packages
-      # ==========================================
+      # 8. Packages
       - name: dbt deps
         run: dbt deps
 
-      # ==========================================
-      # Parse project
-      # ==========================================
-      - name: dbt parse
-        run: dbt parse
-
-      # ==========================================
-      # Compile project
-      # ==========================================
-      - name: dbt compile
-        run: dbt compile
-
-      # ==========================================
-      # Build project
-      # ==========================================
+      # 9. Slim CI si manifest dispo, sinon full build
       - name: dbt build
-        run: dbt build
+        run: |
+          if [ -f prod_artifacts/manifest.json ]; then
+            echo "✅ Manifest trouvé — Slim CI (modèles modifiés uniquement)"
+            dbt build \
+              --select state:modified+ \
+              --defer \
+              --state prod_artifacts
+          else
+            echo "⚠️ Pas de manifest — Full build"
+            dbt build
+          fi
 
-      # ==========================================
-      # Run tests
-      # ==========================================
-      - name: dbt test
-        run: dbt test
-
-      # ==========================================
-      # Upload artifacts
-      # ==========================================
+      # 10. Sauvegarder les artefacts pour le prochain CI
       - name: Upload dbt artifacts
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: dbt-artifacts
-          path: |
-            03_dbt/dbt_analytics/target/
-            03_dbt/dbt_analytics/logs/
+          path: 03_dbt/dbt_analytics/target/manifest.json
 
-      # ==========================================
-      # Cleanup temporary datasets
-      # ==========================================
+      # 11. Nettoyage dataset CI
       - name: Cleanup CI dataset
         if: always()
         run: |
-          python << EOF
+          python3 << PYEOF
           from google.cloud import bigquery
-
-          client = bigquery.Client.from_service_account_json(
-              "/tmp/keyfile.json"
-          )
-
-          datasets = list(client.list_datasets())
-
-          for dataset in datasets:
-              if dataset.dataset_id.startswith("dbt_ci"):
-                  dataset_id = f"{dataset.project}.{dataset.dataset_id}"
-
-                  client.delete_dataset(
-                      dataset_id,
-                      delete_contents=True,
-                      not_found_ok=True
-                  )
-
-                  print(f"Deleted dataset: {dataset_id}")
-
-          EOF
+          client = bigquery.Client.from_service_account_json("/tmp/keyfile.json")
+          pr_number = "${{ github.event.pull_request.number }}"
+          dataset_id = f"databird-formation-494820.dbt_ci_pr_{pr_number}"
+          client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
+          print(f"✅ Dataset {dataset_id} supprimé")
+          PYEOF
