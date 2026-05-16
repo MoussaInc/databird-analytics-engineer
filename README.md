@@ -11,8 +11,8 @@ databird-analytics-engineer/
 ├── 01_cloud_sql_advanced/     # SQL avancé & BigQuery
 ├── 02_Fivetran_Airbyte/       # Ingestion de données (ELT)
 ├── 03_dbt/                    # Transformation dbt Core + CI/CD
-├── 04_data_pipeline/          # Pipelines de données
-└── 05_dashboarding/           # Visualisation & reporting
+├── ....
+
 ```
 
 ---
