@@ -7,6 +7,7 @@ FROM orders
 GROUP BY month
 ORDER BY month
 
+
 -- calcul le cumul du chiffre d’affaires jour par jour
 SELECT
     DATE_TRUNC('day', order_date) AS day,
