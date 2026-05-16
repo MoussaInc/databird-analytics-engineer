@@ -1,4 +1,4 @@
 SELECT 
-    unit_price
+    id
 FROM {{ ref('stg_airbnb__listings') }}
-WHERE unit_price < 0 OR unit_price IS NULL
+WHERE price < 0 OR price IS NULL
