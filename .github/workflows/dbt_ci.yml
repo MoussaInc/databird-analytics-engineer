@@ -1,3 +1,5 @@
+# /.github/workflows/dbt_ci.yml
+
 name: dbt CI — Pull Request Check
 
 on:
@@ -26,8 +28,7 @@ jobs:
         run: pip install dbt-bigquery
 
       - name: Setup GCP credentials
-        run: |
-          echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > /tmp/keyfile.json
+        run: echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > /tmp/keyfile.json
 
       - name: Setup profiles.yml
         run: |
@@ -52,12 +53,24 @@ jobs:
       - name: dbt deps
         run: dbt deps
 
-      - name: dbt compile
-        run: dbt compile
+      - name: Debug - list files
+        run: |
+          echo "=== PWD ==="
+          pwd
+          echo "=== ROOT ==="
+          ls -la
+          echo "=== PROD ARTIFACTS ==="
+          ls -la prod_artifacts/ || echo "prod_artifacts NOT FOUND"
 
       - name: dbt build
-        run: dbt build --select state:modified+ --defer --state ./prod_artifacts
-        continue-on-error: false
+        run: |
+          if [ -f ./prod_artifacts/manifest.json ]; then
+            echo "Manifest found — running slim CI"
+            dbt build --select state:modified+ --defer --state ./prod_artifacts
+          else
+            echo "No manifest — running full build"
+            dbt build
+          fi
 
       - name: Cleanup CI dataset
         if: always()
@@ -65,7 +78,6 @@ jobs:
           pip install google-cloud-bigquery --quiet
           python3 - << PYEOF
           from google.cloud import bigquery
-          import os
           client = bigquery.Client.from_service_account_json('/tmp/keyfile.json')
           dataset_id = f"databird-formation-494820.dbt_ci_${{ github.event.pull_request.number }}"
           client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
