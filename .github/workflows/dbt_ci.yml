@@ -1,0 +1,73 @@
+name: dbt CI — Pull Request Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '03_dbt/dbt_analytics/**'
+
+jobs:
+  dbt-ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 03_dbt/dbt_analytics
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt
+        run: pip install dbt-bigquery
+
+      - name: Setup GCP credentials
+        run: |
+          echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > /tmp/keyfile.json
+
+      - name: Setup profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << PROFILE
+          databird_analytics:
+            target: ci
+            outputs:
+              ci:
+                type: bigquery
+                method: service-account
+                project: databird-formation-494820
+                dataset: dbt_ci_${{ github.event.pull_request.number }}
+                keyfile: /tmp/keyfile.json
+                threads: 4
+                location: US
+          PROFILE
+
+      - name: dbt debug
+        run: dbt debug
+
+      - name: dbt deps
+        run: dbt deps
+
+      - name: dbt compile
+        run: dbt compile
+
+      - name: dbt build
+        run: dbt build --select state:modified+ --defer --state ./prod_artifacts
+        continue-on-error: false
+
+      - name: Cleanup CI dataset
+        if: always()
+        run: |
+          pip install google-cloud-bigquery --quiet
+          python3 - << PYEOF
+          from google.cloud import bigquery
+          import os
+          client = bigquery.Client.from_service_account_json('/tmp/keyfile.json')
+          dataset_id = f"databird-formation-494820.dbt_ci_${{ github.event.pull_request.number }}"
+          client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
+          print(f"Dataset {dataset_id} supprimé")
+          PYEOF
