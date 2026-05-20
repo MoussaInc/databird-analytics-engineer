@@ -1,24 +1,60 @@
+############################
 # Python
+############################
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
 
+############################
+# Virtual environments
+############################
+.venv/
+venv/
+
+############################
 # Jupyter
+############################
 .ipynb_checkpoints/
 
+############################
 # OS
+############################
 .DS_Store
 
-# Env
+############################
+# dbt artifacts
+############################
+target/
+dbt_packages/
+logs/
+
+############################
+# Environment variables
+############################
 .env
 
-# Data files (si lourds)
+############################
+# Credentials
+############################
+profiles.yml
+*.pem
+*.key
+service-account*.json
+*.json
+*/*.json
+
+# dossiers sensibles
+creds/
+./creds/
+
+############################
+# Data files (OPTIONNEL)
+############################
 *.csv
 *.parquet
 
-# BigQuery exports
-*.json
-
-# Credentials
-*.json
-creds/
-/creds/
+############################
+# IDE
+############################
+.vscode/
+.idea/
