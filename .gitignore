@@ -9,7 +9,15 @@ __pycache__/
 .DS_Store
 
 # Env
+.venv
+requirements.txt
+.venv/
+target/
+logs/
+dbt_packages/
 .env
+__pycache__/
+*.pyc
 
 # Data files (si lourds)
 *.csv

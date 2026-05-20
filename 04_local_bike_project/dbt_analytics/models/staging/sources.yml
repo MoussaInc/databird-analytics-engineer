@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: raw_data
+    database: dbt_db
+    schema: dbt_schema
+    tables:
+      - name: customers
+      - name: orders
+      - name: order_items
+      - name: stores
+      - name: staffs
+      - name: products
+      - name: categories
+      - name: stocks
+      - name: brands
