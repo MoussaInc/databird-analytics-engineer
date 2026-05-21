@@ -14,6 +14,11 @@ clean-targets:
   - "dbt_packages"
 
 models:
+
+  +persist_docs:
+    relation: true
+    columns: true
+
   dbt_snow:
     staging:
       +schema: staging
