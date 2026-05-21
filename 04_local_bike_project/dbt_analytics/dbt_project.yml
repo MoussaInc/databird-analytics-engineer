@@ -1,6 +1,6 @@
-name: 'dbt_analytics'
+name: 'dbt_snow'
 version: '1.0.0'
-profile: 'dbt_analytics'
+profile: 'dbt_snow'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -14,8 +14,18 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  dbt_analytics:
+
+  +persist_docs:
+    relation: true
+    columns: true
+
+  dbt_snow:
     staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
       +materialized: view
     marts:
+      +schema: marts
       +materialized: table

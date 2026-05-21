@@ -2,8 +2,8 @@ version: 2
 
 sources:
   - name: raw_data
-    database: dbt_db
-    schema: dbt_schema
+    database: local_bike_original
+    schema: public
     tables:
       - name: customers
       - name: orders

@@ -1,0 +1,310 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: >
+      Staging model for customer data coming from the raw Bike Store dataset.
+      This model standardizes customer information and creates a derived full_name column
+      used for analytics and downstream marts models.
+
+    columns:
+
+      - name: customer_id
+        description: Unique identifier of the customer.
+        tests:
+          - not_null
+          - unique
+
+      - name: first_name
+        description: Customer first name.
+
+      - name: last_name
+        description: Customer last name.
+
+      - name: full_name
+        description: Concatenation of first_name and last_name.
+
+      - name: email
+        description: Customer email address.
+
+      - name: phone
+        description: Customer phone number.
+
+      - name: street
+        description: Customer street address.
+
+      - name: city
+        description: Customer city.
+
+      - name: state
+        description: Customer state.
+
+      - name: zip_code
+        description: Customer ZIP/postal code.
+
+  - name: stg_orders
+    description: >
+      Staging model for customer orders coming from the raw Bike Store dataset.
+      This model standardizes order-related fields and renames date columns
+      for consistency across the analytics warehouse.
+
+    columns:
+
+      - name: order_id
+        description: Unique identifier of the order.
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        description: Identifier of the customer who placed the order.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+      - name: staff_id
+        description: Identifier of the staff member responsible for the order.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_staffs')
+              field: staff_id
+
+      - name: store_id
+        description: Identifier of the store where the order was placed.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_stores')
+              field: store_id
+
+      - name: order_at
+        description: Date when the order was created.
+
+      - name: order_status
+        description: Current status of the order.
+
+      - name: required_at
+        description: Expected delivery date requested for the order.
+
+      - name: shipped_at
+        description: Date when the order was shipped.
+
+  - name: stg_order_items
+    description: >
+      Staging model for order item details coming from the raw Bike Store dataset.
+      This model standardizes order line information, casts numeric fields to appropriate
+      data types, and generates a surrogate primary key for each order item.
+
+    columns:
+
+      - name: order_item_id
+        description: >
+          Surrogate key generated from order_id, item_id, and product_id
+          to uniquely identify each order line.
+        tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        description: Identifier of the related order.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+
+      - name: item_id
+        description: Line item number within the order.
+
+      - name: product_id
+        description: Identifier of the purchased product.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+
+      - name: quantity
+        description: Quantity of the product ordered.
+
+      - name: price
+        description: Unit price of the product at the time of purchase.
+
+      - name: discount
+        description: Discount amount applied to the order item.
+
+  - name: stg_products
+    description: >
+      Staging model for product data coming from the raw Bike Store dataset.
+      This model standardizes product-related information and prepares product
+      attributes for downstream analytics and dimensional modeling.
+
+    columns:
+
+      - name: product_id
+        description: Unique identifier of the product.
+        tests:
+          - not_null
+          - unique
+
+      - name: product_name
+        description: Name of the product.
+
+      - name: category_id
+        description: Identifier of the product category.
+        tests:
+          - not_null
+          - relationships:
+              field: category_id
+              to: ref('stg_categories')
+
+      - name: brand_id
+        description: Identifier of the product brand.
+        tests:
+          - not_null
+          - relationships:
+              field: brand_id
+              to: ref('stg_brands')
+
+      - name: price
+        description: Retail price of the product.
+
+      - name: model_year
+        description: Manufacturing or release year of the product model.
+
+  - name: stg_staffs
+    description: >
+      Staging model for staff data coming from the raw Bike Store dataset.
+      This model standardizes employee-related information and creates a derived
+      full_name column for easier analytics and reporting.
+
+    columns:
+
+      - name: staff_id
+        description: Unique identifier of the staff member.
+        tests:
+          - not_null
+          - unique
+
+      - name: store_id
+        description: Identifier of the store where the staff member works.
+        tests:
+          - not_null
+          - relationships:
+              field: store_id
+              to: ref('stg_stores')
+
+      - name: manager_id
+        description: Identifier of the staff member's manager.
+
+      - name: full_name
+        description: Concatenation of first_name and last_name.
+
+      - name: email
+        description: Staff member email address.
+
+      - name: phone
+        description: Staff member phone number.
+
+      - name: active
+        description: Indicates whether the staff member is currently active.
+
+  - name: stg_stores
+    description: >
+      Staging model for store data coming from the raw Bike Store dataset.
+      This model standardizes store-related information used for operational
+      and sales analytics.
+
+    columns:
+
+      - name: store_id
+        description: Unique identifier of the store.
+        tests:
+          - not_null
+          - unique
+
+      - name: store_name
+        description: Name of the store.
+
+      - name: email
+        description: Store contact email address.
+
+      - name: phone
+        description: Store contact phone number.
+
+      - name: street
+        description: Store street address.
+
+      - name: city
+        description: City where the store is located.
+
+      - name: state
+        description: State where the store is located.
+
+      - name: zip_code
+        description: ZIP/postal code of the store location.   
+
+  - name: stg_categories
+    description: >
+      Staging model for product category data coming from the raw Bike Store dataset.
+      This model standardizes product category information used for product analytics
+      and dimensional modeling.
+
+    columns:
+
+      - name: category_id
+        description: Unique identifier of the product category.
+        tests:
+          - not_null
+          - unique
+
+      - name: category_name
+        description: Name of the product category.
+
+
+  - name: stg_brands
+    description: >
+      Staging model for product brand data coming from the raw Bike Store dataset.
+      This model standardizes brand information used for product analytics
+      and downstream dimensional models.
+
+    columns:
+
+      - name: brand_id
+        description: Unique identifier of the product brand.
+        tests:
+          - not_null
+          - unique
+
+      - name: brand_name
+        description: Name of the product brand. 
+
+  - name: stg_stocks
+    description: >
+      Staging model for inventory stock data coming from the raw Bike Store dataset.
+      This model standardizes product inventory information across stores and prepares
+      stock quantities for downstream inventory and sales analytics.
+
+    columns:
+
+      - name: product_id
+        description: Identifier of the product in inventory.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+
+      - name: store_id
+        description: Identifier of the store holding the inventory.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_stores')
+              field: store_id
+
+      - name: quantity
+        description: Available quantity of the product in stock for a given store.
