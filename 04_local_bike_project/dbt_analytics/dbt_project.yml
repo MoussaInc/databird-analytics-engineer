@@ -20,12 +20,15 @@ models:
     columns: true
 
   dbt_snow:
+
     staging:
       +schema: staging
       +materialized: view
+
     intermediate:
       +schema: intermediate
       +materialized: view
+      
     marts:
       +schema: marts
       +materialized: table

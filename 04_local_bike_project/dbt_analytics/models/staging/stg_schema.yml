@@ -199,6 +199,10 @@ models:
 
       - name: manager_id
         description: Identifier of the staff member's manager.
+        tests:
+          - relationships:
+              field: manager_id
+              to: ref('stg_staffs')
 
       - name: full_name
         description: Concatenation of first_name and last_name.
