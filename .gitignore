@@ -40,8 +40,6 @@ profiles.yml
 *.pem
 *.key
 service-account*.json
-*.json
-*/*.json
 
 # dossiers sensibles
 creds/
