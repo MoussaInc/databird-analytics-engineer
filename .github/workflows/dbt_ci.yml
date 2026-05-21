@@ -8,13 +8,19 @@ on:
       - main
     paths:
       - "03_dbt/dbt_analytics/**"
+      - "04_local_bike_project/dbt_analytics/**"
       - ".github/workflows/dbt_ci.yml"
 
 env:
-  PYTHON_VERSION: "3.11"
+  PYTHON_VERSION: "3.12"
 
 jobs:
-  dbt-ci:
+
+  # ─────────────────────────────────────────────
+  # JOB 1 — 03_dbt (warehouse = bigquery)
+  # ─────────────────────────────────────────────
+  dbt-ci-bigquery:
+    name: dbt CI — 03_dbt (BigQuery)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -63,19 +69,19 @@ jobs:
           ls -la
           dbt --version
 
-      - name: dbt debug
-        run: dbt debug
-
       - name: dbt deps
         run: dbt deps
+
+      - name: dbt debug
+        run: dbt debug
 
       - name: dbt build
         run: |
           if [ -f prod_artifacts/manifest.json ]; then
-            echo "Manifest trouve — Slim CI"
+            echo "Manifest found — Slim CI"
             dbt build --select state:modified+ --defer --state prod_artifacts
           else
-            echo "Pas de manifest — Full build"
+            echo "No manifest — Full build"
             dbt build
           fi
 
@@ -83,7 +89,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: dbt-artifacts
+          name: dbt-artifacts-bigquery
           path: 03_dbt/dbt_analytics/target/manifest.json
 
       - name: Cleanup CI dataset
@@ -95,5 +101,104 @@ jobs:
           pr_number = "${{ github.event.pull_request.number }}"
           dataset_id = f"databird-formation-494820.dbt_ci_pr_{pr_number}"
           client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
-          print(f"Dataset {dataset_id} supprime")
+          print(f"Dataset {dataset_id} deleted")
+          PYEOF
+
+  # ─────────────────────────────────────────────
+  # JOB 2 — 04_local_bike_project (warehouse = snowflake)
+  # ─────────────────────────────────────────────
+  dbt-ci-snowflake:
+    name: dbt CI — 04_local_bike_project (Snowflake)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 04_local_bike_project/dbt_analytics
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-snowflake
+
+      - name: Setup dbt profile
+        env:
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << PROFILE
+          dbt_snow:
+            target: ci
+            outputs:
+              ci:
+                type: snowflake
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                password: "${SNOWFLAKE_PASSWORD}"
+                role: DBT_ROLE
+                database: DBT_DB
+                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+                schema: dbt_ci_pr_${{ github.event.pull_request.number }}
+                threads: 4
+                client_session_keep_alive: false
+          PROFILE
+
+      - name: Check environment
+        run: |
+          pwd
+          ls -la
+          dbt --version
+
+      - name: dbt deps
+        run: dbt deps
+
+      - name: dbt debug
+        run: dbt debug
+
+      - name: dbt build
+        run: |
+          if [ -f prod_artifacts/manifest.json ]; then
+            echo "Manifest found — Slim CI"
+            dbt build --select state:modified+ --defer --state prod_artifacts
+          else
+            echo "No manifest — Full build"
+            dbt build
+          fi
+
+      - name: Upload dbt artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts-snowflake
+          path: 04_local_bike_project/dbt_analytics/target/manifest.json
+
+      - name: Cleanup CI schema
+        if: always()
+        env:
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        run: |
+          python3 << PYEOF
+          import snowflake.connector
+          import os
+
+          conn = snowflake.connector.connect(
+              account="${{ secrets.SNOWFLAKE_ACCOUNT }}",
+              user="${{ secrets.SNOWFLAKE_USER }}",
+              password=os.environ["SNOWFLAKE_PASSWORD"],
+              role="DBT_ROLE",
+              database="DBT_DB",
+              warehouse="${{ secrets.SNOWFLAKE_WAREHOUSE }}",
+          )
+          pr_number = "${{ github.event.pull_request.number }}"
+          schema = f"dbt_ci_pr_{pr_number}"
+          conn.cursor().execute(f"DROP SCHEMA IF EXISTS DBT_DB.{schema} CASCADE")
+          print(f"Schema {schema} deleted")
+          conn.close()
           PYEOF
