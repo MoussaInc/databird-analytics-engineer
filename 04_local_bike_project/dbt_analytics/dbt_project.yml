@@ -32,3 +32,6 @@ models:
     marts:
       +schema: marts
       +materialized: table
+
+vars:
+   order_status_values: ['Pending', 'Processing', 'Rejected', 'Completed', 'Refunded', 'Unknown_status']

@@ -61,24 +61,27 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_customers')
-              field: customer_id
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
 
       - name: staff_id
         description: Identifier of the staff member responsible for the order.
         tests:
           - not_null
           - relationships:
-              to: ref('stg_staffs')
-              field: staff_id
+              arguments:
+                to: ref('stg_staffs')
+                field: staff_id
 
       - name: store_id
         description: Identifier of the store where the order was placed.
         tests:
           - not_null
           - relationships:
-              to: ref('stg_stores')
-              field: store_id
+              arguments:
+                to: ref('stg_stores')
+                field: store_id
 
       - name: order_at
         description: Date when the order was created.
@@ -113,8 +116,9 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_orders')
-              field: order_id
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
 
       - name: item_id
         description: Line item number within the order.
@@ -124,8 +128,9 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_products')
-              field: product_id
+              arguments:
+                to: ref('stg_products')
+                field: product_id
 
       - name: quantity
         description: Quantity of the product ordered.
@@ -158,16 +163,18 @@ models:
         tests:
           - not_null
           - relationships:
-              field: category_id
-              to: ref('stg_categories')
+              arguments:
+                field: category_id
+                to: ref('stg_categories')
 
       - name: brand_id
         description: Identifier of the product brand.
         tests:
           - not_null
           - relationships:
-              field: brand_id
-              to: ref('stg_brands')
+              arguments:
+                field: brand_id
+                to: ref('stg_brands')
 
       - name: price
         description: Retail price of the product.
@@ -194,15 +201,17 @@ models:
         tests:
           - not_null
           - relationships:
-              field: store_id
-              to: ref('stg_stores')
+              arguments:
+                field: store_id
+                to: ref('stg_stores')
 
       - name: manager_id
         description: Identifier of the staff member's manager.
         tests:
           - relationships:
-              field: manager_id
-              to: ref('stg_staffs')
+              arguments:
+                field: manager_id
+                to: ref('stg_staffs')
 
       - name: full_name
         description: Concatenation of first_name and last_name.
@@ -299,16 +308,18 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_products')
-              field: product_id
+              arguments:
+                field: product_id 
+                to: ref('stg_products')
 
       - name: store_id
         description: Identifier of the store holding the inventory.
         tests:
           - not_null
           - relationships:
-              to: ref('stg_stores')
-              field: store_id
+              arguments:
+                to: ref('stg_stores')
+                field: store_id
 
       - name: quantity
         description: Available quantity of the product in stock for a given store.

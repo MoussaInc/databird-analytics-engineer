@@ -1,0 +1,272 @@
+
+version: 2
+
+models:
+  - name: dim_customers
+    description: >
+      Customer dimension table containing standardized customer information
+      used for sales analytics and dashboard filtering.
+
+    columns:
+      - name: customer_id
+        description: Unique identifier of the customer.
+        tests:
+          - not_null
+          - unique
+
+      - name: full_name
+        description: Full name of the customer.
+        tests:
+          - not_null
+
+      - name: email
+        description: Customer email address.
+
+      - name: phone
+        description: Customer phone number.
+
+      - name: street
+        description: Customer street address.
+
+      - name: city
+        description: City of the customer.
+
+      - name: state
+        description: State of the customer.
+
+      - name: zip_code
+        description: ZIP/postal code of the customer.
+
+  - name: dim_products
+    description: >
+      Product dimension table enriched with category and brand information.
+      Used as a dimension in the star schema for sales analytics.
+
+    columns:
+      - name: product_id
+        description: Unique identifier of the product.
+        tests:
+          - not_null
+          - unique
+
+      - name: product_name
+        description: Name of the product.
+        tests:
+          - not_null
+
+      - name: model_year
+        description: Manufacturing or release year of the product.
+
+      - name: price
+        description: Retail price of the product.
+        tests:
+          - not_null
+
+      - name: category_id
+        description: Identifier of the product category.
+        tests:
+          - not_null
+
+      - name: category_name
+        description: Name of the product category.
+
+      - name: brand_id
+        description: Identifier of the product brand.
+        tests:
+          - not_null
+
+      - name: brand_name
+        description: Name of the product brand.
+
+  - name: dim_stores
+    description: >
+      Store dimension table containing standardized store information
+      used for geographic and operational sales analysis.
+
+    columns:
+      - name: store_id
+        description: Unique identifier of the store.
+        tests:
+          - not_null
+          - unique
+
+      - name: store_name
+        description: Name of the store.
+        tests:
+          - not_null
+
+      - name: email
+        description: Store contact email address.
+
+      - name: phone
+        description: Store contact phone number.
+
+      - name: street
+        description: Store street address.
+
+      - name: city
+        description: City where the store is located.
+
+      - name: state
+        description: State where the store is located.
+
+      - name: zip_code
+        description: ZIP/postal code of the store.
+
+  - name: dim_dates
+    description: >
+      Date dimension table generated from a date spine covering 2016 to 2019.
+      Provides time-based attributes for slicing and filtering sales data
+      in Metabase dashboards.
+
+    columns:
+      - name: date_id
+        description: Unique date identifier — primary key of the dimension.
+        tests:
+          - not_null
+          - unique
+
+      - name: full_date
+        description: Full date value.
+
+      - name: year
+        description: Year extracted from the date.
+
+      - name: month
+        description: Month number extracted from the date (1-12).
+
+      - name: day
+        description: Day number extracted from the date (1-31).
+
+      - name: quarter
+        description: Quarter extracted from the date (1-4).
+
+      - name: day_of_week
+        description: Day of week number — 0=Sunday, 6=Saturday in Snowflake.
+
+      - name: day_name
+        description: Name of the day (Monday, Tuesday...).
+
+      - name: month_name
+        description: Name of the month (January, February...).
+
+      - name: is_weekend
+        description: Boolean indicating whether the date falls on a weekend.
+
+  - name: fact_sales
+    description: >
+      Central fact table of the star schema combining order items with order,
+      customer, store, staff, product, and date information.
+      Contains all revenue and delivery metrics used for Metabase dashboards.
+
+    columns:
+      - name: order_item_id
+        description: Surrogate key uniquely identifying each sales fact row.
+        tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        description: Identifier of the related order.
+        tests:
+          - not_null
+
+      - name: item_id
+        description: Line item number within the order.
+        tests:
+          - not_null
+
+      - name: product_id
+        description: Foreign key to dim_products.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+
+      - name: category_id
+        description: Foreign key to the product category.
+        tests:
+          - not_null
+
+      - name: brand_id
+        description: Foreign key to the product brand.
+        tests:
+          - not_null
+
+      - name: customer_id
+        description: Foreign key to dim_customers.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+
+      - name: store_id
+        description: Foreign key to dim_stores.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_stores')
+                field: store_id
+
+      - name: staff_id
+        description: Identifier of the staff member who handled the order.
+        tests:
+          - not_null
+
+      - name: date_id
+        description: Foreign key to dim_dates.
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_dates')
+                field: date_id
+
+      - name: order_status
+        description: >
+          Human-readable status of the order.
+          Values: 1 = Pending, 2 = Processing, 3 = Rejected, 4 = Completed, Refunded, Unknown_status.
+        tests:
+          - not_null
+          - accepted_status_values
+
+      - name: quantity
+        description: Quantity of the product ordered.
+        tests:
+          - not_null
+
+      - name: price
+        description: Unit price of the product at the time of purchase.
+        tests:
+          - not_null
+
+      - name: discount
+        description: Discount rate applied to the order item.
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0 and discount <= 1"
+
+      - name: unit_price_net
+        description: Unit price after discount.
+
+      - name: revenue_gross
+        description: Gross revenue before discount — quantity * price.
+
+      - name: revenue_net
+        description: Net revenue after discount — quantity * price * (1 - discount).
+
+      - name: discount_amount
+        description: Total discount amount applied to the order line.
+
+      - name: delivery_delay_days
+        description: Number of days between order date and shipped date.
+
+      - name: expected_delay_days
+        description: Number of days between order date and required date.
+
+      - name: is_on_time
+        description: Boolean indicating whether the order was shipped on or before the required date.
