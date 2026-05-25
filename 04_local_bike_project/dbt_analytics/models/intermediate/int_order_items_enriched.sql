@@ -19,6 +19,6 @@ select
     round(oi.quantity * oi.price * oi.discount, 2) as discount_amount
 
 from {{ ref('stg_order_items') }} oi
-left join {{ ref('stg_products') }}  p on oi.product_id  = p.product_id
+left join {{ ref('stg_products') }} p on oi.product_id = p.product_id
 left join {{ ref('stg_categories') }} c on p.category_id = c.category_id
-left join {{ ref('stg_brands') }}     b on p.brand_id    = b.brand_id
+left join {{ ref('stg_brands') }} b on p.brand_id = b.brand_id

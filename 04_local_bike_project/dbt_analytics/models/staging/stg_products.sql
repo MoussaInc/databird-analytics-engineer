@@ -3,6 +3,6 @@ select
     product_name,
     category_id,
     brand_id,
-    list_price as price,
-    model_year
+    cast(list_price as number(10,2)) as price,
+    cast(model_year as int) as model_year
 from {{ source('raw_data', 'products') }}
