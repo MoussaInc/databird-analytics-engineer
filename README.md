@@ -1,57 +1,56 @@
-# Data Analytics Engineering Portfolio — Moussa MBALLO
+# Data Analytics Engineering Portfolio
 
-> Analytics Engineer portfolio: SQL avancé, ingestion de données, transformation dbt et CI/CD sur GCP/BigQuery.
+> End-to-end Analytics Engineering portfolio: advanced SQL, data ingestion, dbt transformation, CI/CD, orchestration and BI dashboarding on GCP/BigQuery & Snowflake.
 
 ---
 
-## 🗂️ Structure du projet
+## 🗂️ Project Structure
 
 ```
 databird-analytics-engineer/
-├── 01_cloud_sql_advanced/     # SQL avancé & BigQuery
-├── 02_Fivetran_Airbyte/       # Ingestion de données (ELT)
-├── 03_dbt/                    # Transformation dbt Core + CI/CD
-├── 04_local_bike_project/     # Analytics Engineering project: snowflake + dbt core + docker/metabase
-├── ....
-
+├── 01_cloud_sql_advanced/       # Advanced SQL & BigQuery
+├── 02_Fivetran_Airbyte/         # Data ingestion (ELT)
+├── 03_dbt/                      # dbt Core transformation + CI/CD (BigQuery)
+├── 04_local_bike_project/       # Full Analytics Engineering project:
+│                                # Snowflake + dbt + Airflow + Metabase + Docker + CI/CD
 ```
 
 ---
 
-## 📦 Projets
+## 📦 Projects
 
-### 1. SQL Avancé & BigQuery — `01_cloud_sql_advanced/`
+### 1. Advanced SQL & BigQuery — `01_cloud_sql_advanced/`
 
-Requêtes SQL métier sur un dataset e-commerce fil rouge (orders, products, sellers, users).
+Business SQL queries on an e-commerce fil rouge dataset (orders, products, sellers, users).
 
-**Exercices réalisés :**
-- **Business queries** — KPIs commandes, produits, vendeurs, clients (LTV, panier moyen)
-- **Partitionnement BigQuery** — analyse avocado, optimisation des scans
-- **Audit BigQuery** — analyse des jobs, coûts, tables (`INFORMATION_SCHEMA`)
-- **SQL avancé** — analyse de volatilité Bitcoin, volumes, window functions
+**Exercises:**
+- **Business queries** — KPIs: orders, products, sellers, customers (LTV, average basket)
+- **BigQuery partitioning** — avocado dataset analysis, scan optimization
+- **BigQuery audit** — jobs analysis, costs, tables (`INFORMATION_SCHEMA`)
+- **Advanced SQL** — Bitcoin volatility analysis, volumes, window functions
 
-**Compétences :** `window functions` · `CTEs` · `agrégations` · `optimisation` · `partitionnement`
+**Skills:** `window functions` · `CTEs` · `aggregations` · `query optimization` · `partitioning`
 
 ---
 
-### 2. Ingestion de données — `02_Fivetran_Airbyte/`
+### 2. Data Ingestion — `02_Fivetran_Airbyte/`
 
-Mise en place de pipelines ELT avec des outils d'ingestion managés.
+ELT pipeline setup with managed ingestion tools.
 
-**Exercices réalisés :**
-- Connexion et configuration de sources avec **Fivetran** et **Airbyte Cloud**
-- Analyse des événements **GA4** : flatten des ARRAY, sessions, clustering
-- KPIs business post-ingestion
+**Exercises:**
+- Source connection and configuration with **Fivetran** and **Airbyte Cloud**
+- **GA4 events** analysis: ARRAY flattening, sessions, clustering
+- Post-ingestion business KPIs
 
-**Compétences :** `Fivetran` · `Airbyte` · `GA4` · `UNNEST` · `tables clusterisées`
+**Skills:** `Fivetran` · `Airbyte` · `GA4` · `UNNEST` · `clustered tables`
 
 ---
 
 ### 3. dbt Core + CI/CD — `03_dbt/`
 
-Projet dbt complet en production avec pipeline CI/CD automatisé sur GitHub Actions.
+Production-grade dbt project with automated CI/CD pipeline on GitHub Actions.
 
-**Architecture du projet dbt :**
+**dbt Architecture:**
 ```
 sources (BigQuery raw data)
     ↓
@@ -62,82 +61,133 @@ intermediate/   int_ga4__session, int_sales_database__order/product/seller/user,
 mart/           mrt_airbnb__listings_summary, mrt_order_daily_report, mrt_spotify__top_artists
 ```
 
-**Domaines couverts :**
-| Domaine | Modèles | Description |
-|---------|---------|-------------|
-| Airbnb | `stg_airbnb__listings`, `mrt_airbnb__listings_summary` | Agrégat prix par quartier & type de logement |
-| Sales Database | 7 modèles staging + 4 intermediate + 1 mart | Pipeline e-commerce complet |
-| GA4 | `stg_ga4__event`, `int_ga4__session` | Analyse sessions web |
-| Spotify | `stg_spotify__*`, `mrt_spotify__top_artists` | Top artistes par écoute |
+**Domains covered:**
+| Domain | Models | Description |
+|---|---|---|
+| Airbnb | 2 models | Price aggregation by neighborhood & room type |
+| Sales Database | 12 models | Full e-commerce pipeline |
+| GA4 | 2 models | Web session analysis |
+| Spotify | 3 models | Top artists by streams |
 
-**Features dbt implémentées :**
-- Matérialisations : `view`, `table`, `incremental`
-- Tests génériques (`unique`, `not_null`, `accepted_values`, `relationships`)
-- Tests custom SQL et `dbt_expectations`
-- Macros Jinja (`product_volume_calculation`)
+**dbt features implemented:**
+- Materializations: `view`, `table`, `incremental`
+- Generic tests (`unique`, `not_null`, `accepted_values`, `relationships`)
+- Custom SQL tests & `dbt_expectations`
+- Jinja macros (`product_volume_calculation`)
 - Seeds (`marketing_budget`)
-- `persist_docs` → propagation des descriptions à BigQuery
+- `persist_docs` → description propagation to BigQuery
 - Variables (`order_status_list`, `payment_type_list`, `room_type_list`)
-- Packages : `dbt_utils`, `dbt_expectations`, `dbt_date`
+- Packages: `dbt_utils`, `dbt_expectations`, `dbt_date`
 
-**CI/CD avec GitHub Actions :**
-```yaml
-Pull Request → GitHub Actions → dbt build → BigQuery CI dataset → Tests → Cleanup
+**CI/CD — GitHub Actions:**
+- Slim CI with `state:modified+` and `--defer` → only modified models tested
+- Isolated BigQuery dataset per PR (`dbt_ci_pr_<number>`)
+- Automatic cleanup after each CI run
+
+---
+
+### 4. Local Bike — Full Analytics Engineering Project — `04_local_bike_project/`
+
+End-to-end analytics engineering project on a bike store chain dataset.
+From raw CSV ingestion to production dashboards, with full orchestration.
+
+**Objective:** Optimize revenue through data-driven insights on stores, products, and customers.
+
+**Full Pipeline:**
 ```
-- Slim CI avec `state:modified+` et `--defer` → seuls les modèles modifiés sont testés
-- Dataset BigQuery isolé par PR (`dbt_ci_pr_<number>`)
-- Nettoyage automatique post-CI
+CSV Files → Snowflake (raw) → dbt (16 models) → Metabase (dashboard)
+```
+
+**dbt Architecture — Star Schema:**
+```
+Raw (Snowflake)
+       ↓
+Staging      → 9 view models  (standardization, casting, renaming)
+       ↓
+Intermediate → 2 view models  (enrichment, revenue metrics, delivery KPIs)
+       ↓
+Marts        → 5 table models (Star Schema ready for BI)
+```
+
+```
+              dim_customers
+                    |
+dim_stores ── fact_sales ── dim_products
+                    |
+              dim_dates
+```
+
+**Data quality:** 96 tests — `not_null`, `unique`, `relationships`, `accepted_values`, `expression_is_true`, singular tests
+
+**BI Dashboard — Metabase:**
+- KPIs: Total Revenue, Orders, Average Basket, On-time Delivery Rate
+- Revenue analysis by store, category, brand, month
+- Product performance: Top 10 products, discount analysis
+- Store & Staff performance: delivery delays, order status
+- Customer analysis: Top 20 customers, revenue by state & city
+- Global filters: date range, store, category, order status
+
+**CI/CD — GitHub Actions:**
+- Triggered on every Pull Request targeting `main`
+- Jobs: `dbt deps` → `dbt debug` → `dbt build` → auto-cleanup CI schema
+- Slim CI with manifest-based selective builds
+
+**Skills:** `Snowflake` · `dbt Core` · `Docker` · `Metabase` · `GitHub Actions` · `Star Schema`
 
 ---
 
-## 🛠️ Stack Technique
+## 🛠️ Tech Stack
 
-| Catégorie | Outils |
-|-----------|--------|
-| Data Warehouse | BigQuery (GCP) |
-| Transformation | dbt Core (dbt-fusion 2.0) |
-| Ingestion | Fivetran, Airbyte |
-| CI/CD | GitHub Actions |
-| Versioning | Git / GitHub |
-| Langages | SQL, Jinja, YAML, Python |
-| Authentification GCP | Service Account |
+| Category | Tools |
+|---|---|
+| **Data Warehouse** | BigQuery (GCP), Snowflake |
+| **Transformation** | dbt Core |
+| **Ingestion** | Fivetran, Airbyte, Python (snowflake-connector) |
+| **BI & Dashboarding** | Metabase (Docker) |
+| **CI/CD** | GitHub Actions |
+| **Containerization** | Docker, Docker Compose |
+| **Versioning** | Git / GitHub |
+| **Languages** | SQL, Python, Jinja, YAML |
 
 ---
 
-## 💡 Compétences
+## 💡 Core Skills
 
-**SQL & BigQuery**
+**SQL & Data Warehousing**
 - Window functions (`ROW_NUMBER`, `RANK`, `LAG`, `LEAD`, `NTILE`)
-- CTEs, sous-requêtes, jointures avancées (anti-join, self-join)
-- Partitionnement & clustering BigQuery
-- `UNNEST` / `ARRAY_AGG` / `STRUCT` — données imbriquées
-- Audit et optimisation de requêtes (`INFORMATION_SCHEMA`)
+- CTEs, subqueries, advanced joins (anti-join, self-join)
+- BigQuery partitioning & clustering
+- `UNNEST` / `ARRAY_AGG` / `STRUCT` — nested data
+- Query audit and optimization (`INFORMATION_SCHEMA`)
+- Snowflake roles, grants, and user management
 
 **dbt**
-- Architecture en couches (staging → intermediate → mart)
-- Modèles incrementaux avec gestion des late-arriving data
-- Tests de qualité des données (générique + singulier + expectations)
-- Documentation et lineage complet
-- CI/CD slim avec `--defer` et `state:modified+`
+- Layered architecture (staging → intermediate → marts)
+- Incremental models with late-arriving data handling
+- Data quality testing (generic + singular + expectations)
+- Full documentation and lineage
+- Slim CI/CD with `--defer` and `state:modified+`
+- Star schema design for BI consumption
 
 **Data Engineering**
-- Design de pipelines ELT modernes
-- Versionning et collaboration Git (feature branches, PRs, code review)
-- Automatisation CI/CD avec GitHub Actions
-- Gestion des credentials GCP (Service Account, Secret Manager)
+- End-to-end ELT pipeline design
+- Containerization with Docker & Docker Compose
+- Git versioning (feature branches, PRs, code review)
+- CI/CD automation with GitHub Actions
+- GCP credentials management (Service Account)
 
 ---
 
-## 👤 À propos
+## 👤 About (Moussa MBALLO)
 
-Consultant & Ingénieur Civil en reconversion vers l'**Analytics Engineering**.
+Consultant & Civil Engineer transitioning into **Analytics Engineering**.
 
-- Solide background analytique et résolution de problèmes complexes
-- Expérience avec des datasets réels de grande volumétrie
-- Approche rigoureuse, orientée production et bonnes pratiques
+- Strong analytical background and complex problem-solving skills
+- Hands-on experience with real-world, large-scale datasets
+- Production-oriented mindset with focus on best practices and data quality
 
 ---
 
 ## 📬 Contact
 
-- **GitHub** : [github.com/MoussaInc](https://github.com/MoussaInc)
+- **GitHub**: [github.com/MoussaInc](https://github.com/MoussaInc)
