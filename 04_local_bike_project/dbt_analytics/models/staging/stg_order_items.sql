@@ -3,7 +3,7 @@ select
     order_id,
     item_id,
     product_id,
-    cast(quantity as integer) as quantity,
-    cast(list_price as decimal(10,2)) as price, 
-    cast(discount as decimal(10,2)) as discount
+    cast(quantity as int) as quantity,
+    cast(list_price as number(10,2)) as price, 
+    cast(discount as float) as discount
 from {{ source('raw_data', 'order_items') }}

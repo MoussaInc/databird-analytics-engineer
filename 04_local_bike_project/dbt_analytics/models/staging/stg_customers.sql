@@ -8,5 +8,5 @@ select
     street,
     city,
     state,
-    zip_code
+    cast(zip_code as int) as zip_code
 from {{ source('raw_data', 'customers') }}
