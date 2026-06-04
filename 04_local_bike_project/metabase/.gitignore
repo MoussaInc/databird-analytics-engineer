@@ -1,0 +1,13 @@
+
+.env
+
+# Docker volumes / local data
+metabase_backup*
+metabase_metabase_backup*
+data/
+.env
+*.tar.gz
+.venv/
+__pycache__/
+target/
+dbt_packages/
