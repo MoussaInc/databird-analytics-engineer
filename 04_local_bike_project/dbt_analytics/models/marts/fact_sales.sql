@@ -1,3 +1,11 @@
+{{
+    config(
+        materialized='incremental',
+        unique_key='order_item_id',
+        incremental_strategy='merge',
+        cluster_by=['date_id', 'store_id']
+    )
+}}
 
 select
     -- clés
@@ -36,3 +44,11 @@ select
 
 from {{ ref('int_order_items_enriched') }} oi
 left join {{ ref('int_orders_enriched') }} o on oi.order_id = o.order_id
+
+{% if is_incremental() %}
+where o.order_at >= (
+    select 
+        coalesce(max(order_at), '1900-01-01')
+    from {{ this }}
+)
+{% endif %}
