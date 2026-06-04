@@ -3,3 +3,8 @@ target/
 dbt_packages/
 logs/
 dbt_internal_packages/
+
+# Docker volumes / local data
+metabase_backup*
+metabase_metabase_backup*
+data/
