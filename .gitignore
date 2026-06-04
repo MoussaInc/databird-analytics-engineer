@@ -8,6 +8,7 @@ __pycache__/
 ############################
 # Virtual environments
 ############################
+.env
 .venv/
 venv/
 
@@ -52,9 +53,15 @@ creds/
 ############################
 *.csv
 *.parquet
+data/
 
 ############################
 # IDE
 ############################
 .vscode/
 .idea/airflow/.env
+
+# Docker volumes / local data
+metabase_backup*
+metabase_metabase_backup*
+data/

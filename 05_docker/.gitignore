@@ -1,0 +1,14 @@
+# Fichiers media lourds
+*.mp4
+*.mp3
+
+# Docker
+.dockerignore
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
