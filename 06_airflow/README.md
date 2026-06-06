@@ -6,8 +6,22 @@ docker run -d --name airflow \          #Execution du container en arriere plan
     apache/airflow:3.1.7 \                              # Image officielle de AIRFLOW
     standalone
 
+    ou docker run -d --name airflow-standalone \
+        -p 8080:8080 \
+        -e AIRFLOW__CORE__PARALLELISM=1 \
+        -v $(pwd)/airflow-demo/dags:/opt/airflow/dags \
+        -v $(pwd)/airflow-demo/plugins:/opt/airflow/plugins \
+        -v $(pwd)/airflow-demo/logs:/opt/airflow/logs \
+        -v $(pwd)/airflow-demo/config:/opt/airflow/config \
+        apache/airflow:2.9.2 standalone
+
+    Pour recupere le username et password
+    docker logs airflow-standalone
+    docker logs airflow-standalone | grep -i password
+
+
 # Initilaisation de la BD (SQlite)
-docker exec -it airflow airflow db migrate
+docker exec -it airflow-standalone airflow db migrate
 
 # Creation d'un utilisation admin pour acceder a literface web
 docker exec -it airflow airflow users create \
@@ -25,3 +39,8 @@ docker exec -it airflow airflow users create \
   Apres la migration airflow creer automatique un admin user et l'attribuer un mode de passe aleatoire quel'on peut 
   visualiser avec cette commande:
   docker logs airflow | grep "Password for user 'admin'" -A 1
+
+
+# Forcer le scan du disque (si rien les dags ne s'affichent pas dans l'UI)
+  docker exec airflow-standalone airflow dags reserialize
+  docker exec airflow-standalone airflow dags list
