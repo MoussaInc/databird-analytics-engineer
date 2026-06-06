@@ -8,16 +8,21 @@ docker run -d --name airflow \          #Execution du container en arriere plan
 
     ou docker run -d --name airflow-standalone \
         -p 8080:8080 \
+        -u 50000:0 \
         -e AIRFLOW__CORE__PARALLELISM=1 \
         -v $(pwd)/airflow-demo/dags:/opt/airflow/dags \
         -v $(pwd)/airflow-demo/plugins:/opt/airflow/plugins \
         -v $(pwd)/airflow-demo/logs:/opt/airflow/logs \
         -v $(pwd)/airflow-demo/config:/opt/airflow/config \
+        -v $(pwd)/airflow-demo/db:/opt/airflow/db \
         apache/airflow:2.9.2 standalone
 
     Pour recupere le username et password
     docker logs airflow-standalone
     docker logs airflow-standalone | grep -i password
+
+    Pour reinitialiser le mot de passe:
+    docker exec airflow-standalone airflow users reset-password -u admin -p admin123
 
 
 # Initilaisation de la BD (SQlite)
