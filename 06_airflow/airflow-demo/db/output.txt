@@ -1,0 +1,5 @@
+Hello Airflow, this is a message from a Bash script!
+Date d'exécution : Sat Jun  6 14:46:56 UTC 2026
+Utilisateur      : airflow
+Hostname         : 524aa68462f4
+Message          : Hello Airflow

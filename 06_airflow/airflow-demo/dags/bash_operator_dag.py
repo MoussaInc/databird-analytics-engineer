@@ -2,6 +2,21 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from datetime import datetime
 
+SYSTEM_INFOS = """
+echo "============================="
+echo "  INFORMATIONS SYSTEME"
+echo "============================="
+echo "Date        : $(date)"
+echo "Utilisateur : $(whoami)"
+echo "Hostname    : $(hostname)"
+echo "Répertoire  : $(pwd)"
+echo "OS          : $(uname -a)"
+echo "============================="
+echo "Fichiers dans /opt/airflow/dags :"
+ls -l /opt/airflow/dags
+echo "============================="
+"""
+
 with DAG(
     dag_id="bash_operator_dag",
     start_date=datetime(2026, 6, 1),
@@ -22,12 +37,12 @@ with DAG(
 
     list_files = BashOperator(
         task_id="list_files",
-        bash_command="ls -l /opt/airflow/dags",
+        bash_command="ls -lh /opt/airflow/dags",
     )
 
     system_infos = BashOperator(
         task_id="system_infos",
-        bash_command="/opt/airflow/dags/infos.sh ", # espace à la fin pour éviter un bug d'exécution
+        bash_command=SYSTEM_INFOS,
     )
 
     print_message >> [show_date, list_files] >> system_infos
