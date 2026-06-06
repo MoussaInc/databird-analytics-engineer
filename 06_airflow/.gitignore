@@ -1,0 +1,17 @@
+# Airflow
+airflow-demo/logs/
+airflow-demo/config/airflow.cfg
+airflow-demo/config/webserver_config.py
+
+# Base de données SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Env
+.env

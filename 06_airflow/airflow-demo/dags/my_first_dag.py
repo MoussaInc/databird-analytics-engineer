@@ -1,6 +1,6 @@
 from airflow import DAG
 # from airflow.operators.dummy import DummyOperator 
-from airflow.providers.standard.operators.empty import EmptyOperator
+from airflow.operators.empty import EmptyOperator
 from datetime import datetime
 
 
