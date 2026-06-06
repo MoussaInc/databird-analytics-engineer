@@ -8,7 +8,7 @@ with DAG(
     start_date=datetime(2026, 6, 1),
     schedule="@daily",
     catchup=False,
-    default_args={"owner": "airflow_test"},
+    default_args={"owner": "airflow_demo"},
 ) as dag:
 
     extract_task = PythonOperator(task_id="extract", python_callable=extract)

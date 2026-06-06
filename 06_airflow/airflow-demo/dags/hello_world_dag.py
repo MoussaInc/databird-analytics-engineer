@@ -11,7 +11,7 @@ with DAG(
     schedule="* 1 * * *",  # toutes les heures
     catchup=False,
     default_args={
-        "owner": "airflow_test",
+        "owner": "airflow_demo",
     },
 ) as dag:
 

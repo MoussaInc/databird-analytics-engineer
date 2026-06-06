@@ -8,8 +8,8 @@ docker run -d --name airflow \          #Execution du container en arriere plan
 
     ou docker run -d --name airflow-standalone \
         -p 8080:8080 \
-        -u 50000:0 \
         -e AIRFLOW__CORE__PARALLELISM=1 \
+        -e _PIP_ADDITIONAL_REQUIREMENTS="xlrd openpyxl pandas" \
         -v $(pwd)/airflow-demo/dags:/opt/airflow/dags \
         -v $(pwd)/airflow-demo/plugins:/opt/airflow/plugins \
         -v $(pwd)/airflow-demo/logs:/opt/airflow/logs \
@@ -49,3 +49,20 @@ docker exec -it airflow airflow users create \
 # Forcer le scan du disque (si rien les dags ne s'affichent pas dans l'UI)
   docker exec airflow-standalone airflow dags reserialize
   docker exec airflow-standalone airflow dags list
+
+  ## lister tous les dags disponible:
+  docker exec airflow-standalone airflow dags list
+
+  ## Voir les tâches d'un DAG spécifique
+  docker exec airflow-standalone airflow tasks list etl_concrete
+
+  ## Déclencher un DAG manuellement
+  docker exec airflow-standalone airflow dags trigger etl_concrete
+
+  ## Avec une date d'execution specifique
+  docker exec airflow-standalone airflow dags trigger etl_concrete --exec-date 2026-06-06
+
+  ## Vérifier l'état d'un DAG pour une exécution donnée
+  docker exec airflow-standalone airflow dags state etl_concrete 2026-06-06
+  docker exec airflow-standalone airflow dags list-runs -d etl_concrete
+
