@@ -1,39 +1,52 @@
-# Exercice — Bind Mount : persister un fichier après suppression du conteneur
- 
- ## Commande qui lance un conteneur avec un Bind Mount
+# 05 — Docker Volumes
 
+## Bind Mount — persister un fichier sur le host
+
+```bash
+# Créer / écrire dans un fichier
 docker run --rm \
-  -v ~/docker-demo/docs:/app/data \
+  -v $(pwd)/docker-demo/docs:/app/data \
   alpine \
   sh -c "echo 'Hello from Docker!' > /app/data/hello.txt"
 
- ## pour une 2nde et 3ieme ligne dans le meme fichie texte:
-docker run --rm  \
- -v ./docker-demo/docs:/app/data \
-   alpine  \
-   sh -c 'echo "Une 2nde ligne inserer dans le fichier depuis le container" >> /app/data/hello.txt'
-
+# Ajouter des lignes (>>)
 docker run --rm \
- -v ./docker-demo/docs:/app/data \
+  -v $(pwd)/docker-demo/docs:/app/data \
   alpine \
-  sh -c 'echo "Et une 3ieme ligne " >> /app/data/hello.txt'
+  sh -c 'echo "2ème ligne" >> /app/data/hello.txt'
+```
 
+> Le fichier persiste sur le host même après suppression du container.
 
-# Named Volumes — Persistance gérée par Docker
+## Named Volume — persistance gérée par Docker
 
- ## creer un volume
- docker volume create data-volume
+```bash
+# Créer un volume
+docker volume create data-volume
 
-  ## lancer le container qui ecrit dans le volume
-  docker run --rm \
-    -v data-volume:/app/data \
-    alpine \
-    sh -c 'echo "Hello depuis un Named Volume !" >> /app/data/hello.txt'
+# Écrire dans le volume
+docker run --rm \
+  -v data-volume:/app/data \
+  alpine \
+  sh -c 'echo "Hello depuis un Named Volume !" >> /app/data/hello.txt'
 
-  ## supprime le container et verifier la persistance du volume
-  docker rm alpine
-  docker ps -a
-  docker volume ls
+# Inspecter le volume (chemin exact sur le host)
+docker volume inspect data-volume
 
-  ## pour connaitre le chemin exact du volume creer
-  docker volume inspect data-volume
+# Lister les volumes
+docker volume ls
+
+# Supprimer un volume
+docker volume rm data-volume
+```
+
+> Le volume persiste même après suppression du container.  
+> Contrairement au Bind Mount, c'est Docker qui gère l'emplacement sur le disque.
+
+## Bind Mount vs Named Volume
+
+| | Bind Mount | Named Volume |
+|---|---|---|
+| Emplacement | Défini par l'utilisateur | Géré par Docker |
+| Usage | Partager des fichiers avec le host | Persistance de données |
+| Commande | `-v $(pwd)/dossier:/container` | `-v nom-volume:/container` |
