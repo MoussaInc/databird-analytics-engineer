@@ -66,3 +66,4 @@ docker exec -it airflow airflow users create \
   docker exec airflow-standalone airflow dags state etl_concrete 2026-06-06
   docker exec airflow-standalone airflow dags list-runs -d etl_concrete
 
+# Passer une variable d'env a un script bash via BashOperator
