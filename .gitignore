@@ -1,19 +1,17 @@
 ############################
-# Python
+# PYTHON
 ############################
 __pycache__/
 *.py[cod]
 *.pyo
+*.pyd
 
-############################
-# Virtual environments
-############################
-.env
 .venv/
 venv/
+.env/
 
 ############################
-# Jupyter
+# JUPYTER
 ############################
 .ipynb_checkpoints/
 
@@ -23,45 +21,78 @@ venv/
 .DS_Store
 
 ############################
-# dbt artifacts
-############################
-target/
-dbt_packages/
-logs/
-
-############################
-# Environment variables
-############################
-.env
-
-############################
-# Credentials
-############################
-profiles.yml
-*.pem
-*.key
-service-account*.json
-*.json
-*/*.json
-
-# dossiers sensibles
-creds/
-./creds/
-
-############################
-# Data files (OPTIONNEL)
-############################
-*.csv
-*.parquet
-data/
-
-############################
 # IDE
 ############################
 .vscode/
-.idea/airflow/.env
+.idea/
 
-# Docker volumes / local data
-metabase_backup*
-metabase_metabase_backup*
-data/
+############################
+# LOGS (GLOBAL PROJECT)
+############################
+logs/
+*/logs/
+**/logs/
+
+############################
+# AIRFLOW (global module)
+############################
+06_airflow/logs/
+06_airflow/db/
+06_airflow/.env
+06_airflow/.dbt/
+
+############################
+# DBT (module 03_dbt)
+############################
+03_dbt/target/
+03_dbt/logs/
+03_dbt/dbt_packages/
+03_dbt/dbt_modules/
+
+############################
+# LOCAL BIKE PROJECT
+############################
+04_local_bike_project/data/
+04_local_bike_project/logs/
+04_local_bike_project/**/target/
+04_local_bike_project/**/db/
+04_local_bike_project/**/dbt_packages/
+
+############################
+# DOCKER / METABASE
+############################
+metabase/*.tar.gz
+*.tar.gz
+
+############################
+# SECRETS / CREDENTIALS
+############################
+*.pem
+*.key
+*.json
+service-account*.json
+creds/
+
+# dbt profiles
+profiles.yml
+*/profiles.yml
+
+############################
+# DATA FILES
+############################
+*.csv
+*.parquet
+*.xls
+*.xlsx
+
+############################
+# REQUIREMENTS CACHE
+############################
+pip-log.txt
+pip-delete-this-directory.txt
+
+############################
+# NOTEBOOK OUTPUTS / ARTIFACTS
+############################
+*.out
+*.log
