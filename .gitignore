@@ -9,6 +9,7 @@ __pycache__/
 .venv/
 venv/
 .env/
+/data/projects/databird-analytics-engineer/04_local_bike_project/airflow/.env
 
 ############################
 # JUPYTER
@@ -57,6 +58,9 @@ logs/
 04_local_bike_project/**/target/
 04_local_bike_project/**/db/
 04_local_bike_project/**/dbt_packages/
+04_local_bike_project/airflow/.env
+**/**/.env
+**/.env
 
 ############################
 # DOCKER / METABASE
