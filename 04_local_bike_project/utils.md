@@ -18,3 +18,7 @@ docker run -d \
   -v $(pwd)/dbt_analytics:/opt/airflow/dbt_analytics \
   airflow-dbt-image
 
+# Reinitialiser le mot de pass
+docker exec -it airflow-dbt-container airflow users reset-passwor -u admin -p admin1234
+
+
