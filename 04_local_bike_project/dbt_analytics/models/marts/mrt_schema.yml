@@ -1,4 +1,3 @@
-
 version: 2
 
 models:
@@ -13,14 +12,23 @@ models:
         tests:
           - not_null
           - unique
+        config:
+          meta:
+            metabase.semantic_type: type/PK
 
       - name: full_name
         description: Full name of the customer.
         tests:
           - not_null
+        config:
+          meta:
+            metabase.semantic_type: type/Name
 
       - name: email
         description: Customer email address.
+        config:
+          meta:
+            metabase.semantic_type: type/Email
 
       - name: phone
         description: Customer phone number.
@@ -30,12 +38,21 @@ models:
 
       - name: city
         description: City of the customer.
+        config:
+          meta:
+            metabase.semantic_type: type/City
 
       - name: state
         description: State of the customer.
+        config:
+          meta:
+            metabase.semantic_type: type/State
 
       - name: zip_code
         description: ZIP/postal code of the customer.
+        config:
+          meta:
+            metabase.semantic_type: type/ZipCode
 
   - name: dim_products
     description: >
@@ -48,11 +65,17 @@ models:
         tests:
           - not_null
           - unique
+        config:
+          meta:
+            metabase.semantic_type: type/PK
 
       - name: product_name
         description: Name of the product.
         tests:
           - not_null
+        config:
+          meta:
+            metabase.semantic_type: type/Title
 
       - name: model_year
         description: Manufacturing or release year of the product.
@@ -61,6 +84,9 @@ models:
         description: Retail price of the product.
         tests:
           - not_null
+        config:
+          meta:
+            metabase.semantic_type: type/Currency
 
       - name: category_id
         description: Identifier of the product category.
@@ -69,6 +95,9 @@ models:
 
       - name: category_name
         description: Name of the product category.
+        config:
+          meta:
+            metabase.semantic_type: type/Category
 
       - name: brand_id
         description: Identifier of the product brand.
@@ -77,6 +106,9 @@ models:
 
       - name: brand_name
         description: Name of the product brand.
+        config:
+          meta:
+            metabase.semantic_type: type/Category
 
   - name: dim_stores
     description: >
@@ -89,14 +121,23 @@ models:
         tests:
           - not_null
           - unique
+        config:
+          meta:
+            metabase.semantic_type: type/PK
 
       - name: store_name
         description: Name of the store.
         tests:
           - not_null
+        config:
+          meta:
+            metabase.semantic_type: type/Name
 
       - name: email
         description: Store contact email address.
+        config:
+          meta:
+            metabase.semantic_type: type/Email
 
       - name: phone
         description: Store contact phone number.
@@ -106,12 +147,21 @@ models:
 
       - name: city
         description: City where the store is located.
+        config:
+          meta:
+            metabase.semantic_type: type/City
 
       - name: state
         description: State where the store is located.
+        config:
+          meta:
+            metabase.semantic_type: type/State
 
       - name: zip_code
         description: ZIP/postal code of the store.
+        config:
+          meta:
+            metabase.semantic_type: type/ZipCode
 
   - name: dim_dates
     description: >
@@ -125,6 +175,9 @@ models:
         tests:
           - not_null
           - unique
+        config:
+          meta:
+            metabase.semantic_type: type/PK
 
       - name: full_date
         description: Full date value.
@@ -140,9 +193,15 @@ models:
 
       - name: quarter
         description: Quarter extracted from the date (1-4).
+        config:
+          meta:
+            metabase.semantic_type: type/Category
 
       - name: day_of_week
         description: Day of week number — 0=Sunday, 6=Saturday in Snowflake.
+        config:
+          meta:
+            metabase.semantic_type: type/Category
 
       - name: day_name
         description: Name of the day (Monday, Tuesday...).
@@ -152,6 +211,56 @@ models:
 
       - name: is_weekend
         description: Boolean indicating whether the date falls on a weekend.
+
+  - name: dim_staff
+    description: >
+      Staff dimension table containing employee information used to attribute
+      sales to the staff member who handled the order.
+
+    columns:
+      - name: staff_id
+        description: Unique identifier of the staff member.
+        tests:
+          - not_null
+          - unique
+        config:
+          meta:
+            metabase.semantic_type: type/PK
+
+      - name: full_name
+        description: Full name of the staff member.
+        tests:
+          - not_null
+        config:
+          meta:
+            metabase.semantic_type: type/Name
+
+      - name: email
+        description: Staff member email address.
+        config:
+          meta:
+            metabase.semantic_type: type/Email
+
+      - name: phone
+        description: Staff member phone number.
+
+      - name: active
+        description: Boolean indicating whether the staff member is currently active.
+
+      - name: store_id
+        description: Foreign key to dim_stores — store where the staff member works.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_stores')
+                field: store_id
+        config:
+          meta:
+            metabase.semantic_type: type/FK
+
+      - name: manager_id
+        description: Staff ID of the manager this staff member reports to (self-referencing).
 
   - name: fact_sales
     description: >
@@ -165,6 +274,9 @@ models:
         tests:
           - not_null
           - unique
+        config:
+          meta:
+            metabase.semantic_type: type/PK
 
       - name: order_id
         description: Identifier of the related order.
@@ -184,6 +296,9 @@ models:
               arguments:
                 to: ref('dim_products')
                 field: product_id
+        config:
+          meta:
+            metabase.semantic_type: type/FK
 
       - name: category_id
         description: Foreign key to the product category.
@@ -203,6 +318,9 @@ models:
               arguments:
                 to: ref('dim_customers')
                 field: customer_id
+        config:
+          meta:
+            metabase.semantic_type: type/FK
 
       - name: store_id
         description: Foreign key to dim_stores.
@@ -212,11 +330,21 @@ models:
               arguments:
                 to: ref('dim_stores')
                 field: store_id
+        config:
+          meta:
+            metabase.semantic_type: type/FK
 
       - name: staff_id
-        description: Identifier of the staff member who handled the order.
+        description: Foreign key to dim_staff — staff member who handled the order.
         tests:
           - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_staff')
+                field: staff_id
+        config:
+          meta:
+            metabase.semantic_type: type/FK
 
       - name: date_id
         description: Foreign key to dim_dates.
@@ -225,6 +353,9 @@ models:
               arguments:
                 to: ref('dim_dates')
                 field: date_id
+        config:
+          meta:
+            metabase.semantic_type: type/FK
 
       - name: order_status
         description: >
@@ -233,40 +364,70 @@ models:
         tests:
           - not_null
           - accepted_status_values
+        config:
+          meta:
+            metabase.semantic_type: type/Category
 
       - name: quantity
         description: Quantity of the product ordered.
         tests:
           - not_null
+        config:
+          meta:
+            metabase.semantic_type: type/Quantity
 
       - name: price
         description: Unit price of the product at the time of purchase.
         tests:
           - not_null
+        config:
+          meta:
+            metabase.semantic_type: type/Currency
 
       - name: discount
         description: Discount rate applied to the order item.
         tests:
           - dbt_utils.expression_is_true:
               expression: ">= 0 and discount <= 1"
+        config:
+          meta:
+            metabase.semantic_type: type/Percentage
 
       - name: unit_price_net
         description: Unit price after discount.
+        config:
+          meta:
+            metabase.semantic_type: type/Currency
 
       - name: revenue_gross
         description: Gross revenue before discount — quantity * price.
+        config:
+          meta:
+            metabase.semantic_type: type/Currency
 
       - name: revenue_net
         description: Net revenue after discount — quantity * price * (1 - discount).
+        config:
+          meta:
+            metabase.semantic_type: type/Currency
 
       - name: discount_amount
         description: Total discount amount applied to the order line.
+        config:
+          meta:
+            metabase.semantic_type: type/Discount
 
       - name: delivery_delay_days
         description: Number of days between order date and shipped date.
+        config:
+          meta:
+            metabase.semantic_type: type/Duration
 
       - name: expected_delay_days
         description: Number of days between order date and required date.
+        config:
+          meta:
+            metabase.semantic_type: type/Duration
 
       - name: is_on_time
         description: Boolean indicating whether the order was shipped on or before the required date.
