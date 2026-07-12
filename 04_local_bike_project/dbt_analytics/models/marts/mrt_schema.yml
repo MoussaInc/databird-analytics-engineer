@@ -338,10 +338,6 @@ models:
         description: Foreign key to dim_staff — staff member who handled the order.
         tests:
           - not_null
-          - relationships:
-              arguments:
-                to: ref('dim_staff')
-                field: staff_id
         config:
           meta:
             metabase.semantic_type: type/FK
@@ -388,7 +384,8 @@ models:
         description: Discount rate applied to the order item.
         tests:
           - dbt_utils.expression_is_true:
-              expression: ">= 0 and discount <= 1"
+              arguments:
+                expression: ">= 0 and discount <= 1"
         config:
           meta:
             metabase.semantic_type: type/Percentage

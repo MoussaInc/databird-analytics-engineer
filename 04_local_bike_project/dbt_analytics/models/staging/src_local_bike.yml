@@ -1,3 +1,5 @@
+# dbt_analytics/models/staging/src_local_bike.yml
+
 version: 2
 
 sources:
@@ -7,6 +9,11 @@ sources:
     tables:
       - name: customers
       - name: orders
+        config:
+          loaded_at_field: order_at
+          freshness:
+            warn_after: {count: 20, period: hour}
+            error_after: {count: 30, period: hour}
       - name: order_items
       - name: stores
       - name: staffs

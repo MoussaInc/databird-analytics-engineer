@@ -1,7 +1,8 @@
 
 {% test accepted_status_values(model, column_name) %}
 
-select *
+select 
+    *
 from {{ model }}
 where {{ column_name }} not in (
     {% for value in var('order_status_values') %}
