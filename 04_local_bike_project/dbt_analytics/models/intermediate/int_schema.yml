@@ -73,7 +73,8 @@ models:
         description: Discount rate applied to the order item (between 0 and 1).
         tests:
           - dbt_utils.expression_is_true:
-              expression: ">= 0 and discount <= 1"
+              arguments:
+                expression: ">= 0 and discount <= 1"
 
       - name: unit_price_net
         description: Unit price after discount applied.

@@ -1,14 +1,12 @@
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-from airflow.sensors.external_task import ExternalTaskSensor
 from datetime import datetime, timedelta
 from alerts import failure_callback
 
 default_args = {
     "owner": "airflow",
-    "retries": 1,
-    "retry_delay": timedelta(minutes=10),
-
+    "retries": 3,
+    "retry_delay": timedelta(minutes=5),
     "email": ["databirdformation@gmail.com"],
     "email_on_failure": True,
     "email_on_retry": False,
