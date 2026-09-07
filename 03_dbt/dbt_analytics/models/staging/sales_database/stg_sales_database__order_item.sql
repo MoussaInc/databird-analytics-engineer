@@ -1,5 +1,6 @@
 select
-    concat(order_id, '-', product_id, '-', seller_id, '-', cast(pickup_limit_date as string)) as order_item_id,
+    --concat(order_id, '-', product_id, '-', seller_id, '-', cast(pickup_limit_date as string)) as order_item_id,
+    {{ dbt_utils.surrogate_key(['order_id', 'product_id', 'seller_id', 'cast(pickup_limit_date as string)']) }} as order_item_id,
     order_id,
     product_id,	
     seller_id,
