@@ -2,3 +2,5 @@ packages:
 - package: metaplane/dbt_expectations
   version: 0.10.10
 
+- package: dbt_utils/surrogate_key
+  version: 1.1.1 
